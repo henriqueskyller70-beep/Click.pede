@@ -43,7 +43,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onNavigate }) =>
   const { supabase, session } = useSession(); // Obter supabase e session do contexto
   const userId = session?.user?.id;
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'orders' | 'store-settings' | 'schedule' | 'clients' | 'staff' | 'reports' | 'profile-settings'>('products'); // Default to products tab
+  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'orders' | 'store-settings' | 'schedule' | 'clients' | 'staff' | 'reports' | 'profile-settings'>('overview'); // Default to overview tab
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [storeProfile, setStoreProfile] = useState<StoreProfile>({ name: '', description: '', primaryColor: '#9f1239', secondaryColor: '#2d1a1a', logoUrl: '', coverUrl: '', address: '', phone: '' }); // Estado inicial vazio
