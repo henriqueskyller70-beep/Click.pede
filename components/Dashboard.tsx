@@ -23,6 +23,7 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  DragOverlay, // Importar DragOverlay
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -106,6 +107,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onNavigate }) =>
   const [isCopyOptionModalOpen, setIsCopyOptionModalOpen] = useState(false);
   const [optionToCopy, setOptionToCopy] = useState<{ productId: string; optionId: string; optionTitle: string } | null>(null);
 
+  // NOVO: Estado para o grupo ativo sendo arrastado (para DragOverlay)
+  const [activeGroup, setActiveGroup] = useState<Group | null>(null);
+
 
   // DND Kit Sensors
   const sensors = useSensors(
@@ -134,7 +138,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onNavigate }) =>
       if (currentUserId) {
         const savedGroups = await storageService.saveGroups(supabase, currentUserId, groupsToSave);
         if (savedGroups) {
-          setGroups(savedGroups); // Update state with the fresh list from DB
+          setGroups(savedGroups as Group[]); // Update state with the fresh list from DB
         }
       }
     }, 1000), // 1 second debounce delay
@@ -338,6 +342,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onNavigate }) =>
       // Save the new order to the database, awaiting the promise
       await storageService.saveGroups(supabase, userId, reindexedGroups);
     }
+    setActiveGroup(null); // Limpar o grupo ativo após o arrasto
+  };
+
+  // DND Kit - handleDragStart function for Groups
+  const handleDragStart = (event: any) => {
+    const group = groups.find(g => g.id === event.active.id);
+    if (group) {
+      setActiveGroup(group);
+    }
+  };
+
+  // DND Kit - handleDragCancel function for Groups
+  const handleDragCancel = () => {
+    setActiveGroup(null);
   };
 
   // DND Kit - handleDragEnd function for Products
@@ -1258,7 +1276,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onNavigate }) =>
                             <DndContext 
                                 sensors={sensors} 
                                 collisionDetection={closestCenter} 
+                                onDragStart={handleDragStart} // Adicionado onDragStart
                                 onDragEnd={handleDragEnd}
+                                onDragCancel={handleDragCancel} // Adicionado onDragCancel
                             >
                                 <SortableContext 
                                     items={filteredGroups.map(g => g.id!)} 
@@ -1280,6 +1300,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onNavigate }) =>
                                         />
                                     ))}
                                 </SortableContext>
+                                <DragOverlay>
+                                  {activeGroup ? (
+                                    <div className="bg-white shadow-xl rounded-lg p-4 w-64 opacity-90 flex items-center gap-2 border border-gray-200">
+                                      <GripVertical className="w-4 h-4 text-gray-400" />
+                                      <span className="font-semibold text-gray-800">{activeGroup.name}</span>
+                                    </div>
+                                  ) : null}
+                                </DragOverlay>
                             </DndContext>
                         </div>
                     </div>

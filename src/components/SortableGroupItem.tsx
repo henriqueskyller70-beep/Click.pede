@@ -53,7 +53,7 @@ export const SortableGroupItem: React.FC<SortableGroupItemProps> = ({
         ${isSelected 
           ? 'text-white shadow-lg transform scale-[1.01]' 
           : 'bg-gray-100 text-gray-700 hover:bg-gray-200 shadow-md hover:shadow-lg hover:translate-x-0.5'}
-        ${isDragging ? 'ring-2 ring-offset-2 ring-blue-500 shadow-2xl scale-105' : ''}
+        ${isDragging ? 'opacity-40' : ''}
       `}
       data-id={group.id}
       onClick={() => onSelect(group.id!)} // Select on click
